@@ -25,6 +25,7 @@ function Weather () {
 		request.onreadystatechange = function() {
 			if (request.readyState == 4 && request.status == 200) {
 					data = JSON.parse(request.responseText);
+					console.log(data);
 					callback(data);
 			} else {
 				console.log(request.status + ': ' + request.statusText);

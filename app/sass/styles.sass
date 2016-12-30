@@ -35,6 +35,8 @@ body, html
 		background: rgba($background, 0.5)
 	.place
 		font-size: 20px
+		+r($mobLand)
+			margin: 0
 	.temp
 		font-size: 50px
 		margin: 10px 0
@@ -45,17 +47,17 @@ body, html
 		vertical-align: text-bottom
 	span 
 	    margin: 0 20px 0 4px
-	+r($mobPort)
+	+r($mobLand)
 		margin: 8px auto 2px
 		padding: 10px
-		width: 80%
+		width: 75%
 
 
 .buttons 
 	width: 320px 
 	margin: 20px auto
 	text-align: center
-	+r($mobLand)
+	+r($tab)
 		position: fixed
 		bottom: 0
 		margin: 0 auto
@@ -70,30 +72,17 @@ body, html
 		background-color: rgba($background, 0.3)
 		border-radius: 8px
 		border: 2px solid #d7d7e5
+		&:active, &:focus
+			outline: none
 		&:hover
 			background-color: rgba($background, 0.6)
-		+r($mobLand)
+		+r($tab)
 			width: 50px
 			height: 50px
 			border-radius: 50px
 		&.addCity
-			+r($mobLand)
+			+r($tab)
 				margin-right: 25%
 		&.rmCity
-			+r($mobLand)
+			+r($tab)
 				margin-left: 25%
-
-// .buttons__mobile
-// 	+r($mobLand)
-// 		display: block
-// 		position: fixed
-// 		bottom: 0
-// 	input
-// 		width: 50px
-// 		height: 50px
-// 		background-color: rgba($background, 0.3)
-// 		border-radius: 50px
-// 		border: 2px solid #d7d7e5
-// 		font: bold 25px Arial, Helvetica, sans-serif
-// 		color: #ffffff
-
