@@ -48,7 +48,8 @@ function Weather () {
 		"<img src='img/wind.png' alt='icon' class='icon wind'>" + 
 		"<span class='wind'> " + obj.wind.speed + " m/s </span>" + 
 		"<img src='img/humidity.png' alt='icon' class='icon humidity'>" + 
-		"<span class='humid'> " + obj.main.humidity + '%' + "</span>";
+		"<span class='humid'> " + obj.main.humidity + '%' + "</span>" + 
+		"<input type='button' class='rmCity' value='&#215;'>";
 
 		w.weatherInfoDiv.appendChild(newDiv);
 	}
@@ -145,7 +146,9 @@ function Weather () {
 
 	}
 
-	w.rmCityBtn.onclick = function(city) {
+	// w.rmCityBtn.onclick = 
+
+	function removeCity() {
 		var cityToRemove = prompt('Which city do you want to remove?');
 
 		if (cityToRemove) {
