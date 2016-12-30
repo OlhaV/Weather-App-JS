@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	 <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<title>Weather App</title>
+	<script src='cities.js'></script>
+	<script src='component.js'></script>
+	<script src='weather.js'></script>
+	<script src='map.js'></script>
+</head>
+<body>
+	<div class='weatherInfo'>
+		<p id='place'></p>
+
+		<p class='description'></p>
+		<p class='temp'></p>
+		<p class='wind'></p>
+		<p class='humidity'></p>
+		<img src="" alt="icon" id="icon">
+	</div>
+
+	<input type="button" class="addCity" value='Add city'>
+	<input type="button" class="rmCity" value='Remove city'>
+
+</body>
+<script>
+	var w1 = new Weather();
+</script>
+</html>

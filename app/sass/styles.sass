@@ -1,0 +1,95 @@
+@import mixins
+@import vars
+
+*
+	transition: 0.4s
+
+body, html 
+	width: 100%
+	height: 100%
+	margin: 0 auto
+	background: url(../img/city.jpg) top center repeat
+	background-size: cover
+	transition: 0.4s
+
+.weatherInfo
+    display: flex
+    flex-wrap: wrap
+    justify-content: center
+    text-shadow: 2px 2px #3d3535
+
+.city 
+	height: 100%
+	width: 250px 
+	margin: 20px
+	padding: 10px 20px 30px 
+	flex: 0 1 auto
+	margin-bottom: 20px
+	background: rgba($background, 0.3)
+	border: 2px solid #d7d7e5
+	border-radius: 10px
+	font: bold 16px Arial, Helvetica, sans-serif
+	color: #ffffff
+	text-align: center
+	&:hover
+		background: rgba($background, 0.5)
+	.place
+		font-size: 20px
+	.temp
+		font-size: 50px
+		margin: 10px 0
+		display: inline-block
+	.weather
+		margin: 0 0 20px 0
+	img 
+		vertical-align: text-bottom
+	span 
+	    margin: 0 20px 0 4px
+	+r($mobPort)
+		margin: 8px auto 2px
+		padding: 10px
+		width: 80%
+
+
+.buttons 
+	width: 320px 
+	margin: 20px auto
+	text-align: center
+	&:focus
+		outline: none
+	+r($mobLand)
+		position: fixed
+		bottom: 0
+		margin: 0 auto
+		text-align: center
+		width: 100%
+	input
+		width: 120px
+		color: #ffffff
+		font: bold 16px Arial, Helvetica, sans-serif
+		padding: 10px
+		margin: 15px 
+		background-color: rgba($background, 0.3)
+		border-radius: 8px
+		border: 2px solid #d7d7e5
+		&:hover
+			background-color: rgba($background, 0.6)
+		+r($mobLand)
+			width: 50px
+			height: 50px
+			border-radius: 50px
+
+// .buttons__mobile
+// 	+r($mobLand)
+// 		display: block
+// 		position: fixed
+// 		bottom: 0
+// 	input
+// 		width: 50px
+// 		height: 50px
+// 		background-color: rgba($background, 0.3)
+// 		border-radius: 50px
+// 		border: 2px solid #d7d7e5
+// 		font: bold 25px Arial, Helvetica, sans-serif
+// 		color: #ffffff
+
