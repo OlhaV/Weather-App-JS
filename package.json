@@ -1,12 +1,12 @@
 {
-  "name": "wethaer-app",
+  "name": "starthtmltemplate",
   "version": "1.0.0",
-  "description": "weather application",
+  "description": "Start HTML Template",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Olha Vasyletska",
+  "author": "Optellect",
   "license": "ISC",
   "devDependencies": {
     "browser-sync": "^2.11.1",

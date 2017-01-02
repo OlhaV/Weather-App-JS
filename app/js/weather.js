@@ -1,10 +1,20 @@
 function Weather () {
+
 	var w = this;
 
 	var weatherUrl = 'http://api.openweathermap.org/data/2.5/weather?'; 
 	var appid = '&appid=c0a7816b2acba9dbfb70977a1e537369';
-	var googleUrl =  'https://maps.googleapis.com/maps/api/geocode/json?address=';
+	var googleUrl =  'https://maps.googleapis.com/maps/api/geocode/json?language=en&address=';
 	var googleKey = '&key=AIzaSyBHBjF5lDpw2tSXVJ6A1ra-RKT90ek5bvQ';
+	var regE = /[A-Za-z]/;
+
+	var city = {
+		name: null,
+		coord: {
+			lat: 0,
+			lon: 0
+		}
+	}
 
 	w.weatherInfoDiv = document.getElementsByClassName('weatherInfo')[0];
 	w.place = document.getElementsByClassName('place')[0];
@@ -21,17 +31,15 @@ function Weather () {
 		var request = new XMLHttpRequest();
 		request.open('GET', url, true);
 		request.send();
-	
+		
 		request.onreadystatechange = function() {
 			if (request.readyState == 4 && request.status == 200) {
 					data = JSON.parse(request.responseText);
-					console.log(data);
 					callback(data);
 			} else {
-				console.log(request.status + ': ' + request.statusText);
+				console.log(request.status);
 			}
 		}
-		
 	}
 
 	function displayFunc (obj, name) {
@@ -48,8 +56,7 @@ function Weather () {
 		"<img src='img/wind.png' alt='icon' class='icon wind'>" + 
 		"<span class='wind'> " + obj.wind.speed + " m/s </span>" + 
 		"<img src='img/humidity.png' alt='icon' class='icon humidity'>" + 
-		"<span class='humid'> " + obj.main.humidity + '%' + "</span>" + 
-		"<input type='button' class='rmCity' value='&#215;'>";
+		"<span class='humid'> " + obj.main.humidity + '%' + "</span>";
 
 		w.weatherInfoDiv.appendChild(newDiv);
 	}
@@ -60,6 +67,30 @@ function Weather () {
 		return tempC;
 	}
 
+	w.checkLocalStorage = function() {
+		var c = localStorage.getItem('cities');
+		c = c ? [JSON.parse(c)] : [];
+		return c;
+	}
+		
+	w.setLocalStorage = function(data, googleData, cities) {
+		if (data) {
+			city.name = data.name; 
+			city.coord.lat = data.coord.lat;
+			city.coord.lon = data.coord.lon;
+			cities.push(JSON.stringify(city));
+			console.log(city);
+			localStorage.setItem("cities", cities);
+
+		} else if (googleData) {
+			//city.name = data.name; 
+			city.coord.lat = googleData.results[0].geometry.location.lat;
+			city.coord.lon = googleData.results[0].geometry.location.lng;
+			console.log(city);
+			cities.push(JSON.stringify(city));
+			localStorage.setItem("cities", cities);
+		}
+	}
 
 	w.getWeatherFunc = function() {
 
@@ -69,16 +100,15 @@ function Weather () {
 				navigator.geolocation.getCurrentPosition(function(location){
 					w.lat = location.coords.latitude;
 					w.lon = location.coords.longitude;
-					var curentLocationWeather = null;
+					var currentLocationWeather = null;
 
 					var url = weatherUrl + 'lat=' + w.lat + '&lon=' + w.lon + appid;
-					sendRequest(url, curentLocationWeather, function(data) {
+					sendRequest(url, currentLocationWeather, function(data) {
 						displayFunc(data, data.name);
-						localStorage.setItem('cities', data.name);
+						w.setLocalStorage(data, null, w.checkLocalStorage());
 					});
 				});
-			} 
-
+			}
 			else {
 				alert('Browser could not find your current location');
 		 	}
@@ -86,69 +116,65 @@ function Weather () {
 
 	// in case there are items in localStorage, we get weather for each of them  
 		else {
-			var cities = localStorage.cities.split(',');
-			var name = null; 
+			var cities = w.checkLocalStorage();
+			var lat, lon;
 
 			for (var i = 0; i < cities.length; i++) {
 
-				(function(name){
+				(function(lat, lon){
+					lat = cities[i].coord.lat;
+					lon = cities[i].coord.lon;
 
-					var gUrl = googleUrl + cities[i] + googleKey;
+					var newUrl = weatherUrl + 'lat=' + lat + '&lon=' + lon + appid;
 					var newCityWeather = null;
-					name = cities[i];
 
-					sendRequest(gUrl, newCityWeather, function(data){
-						var location = data.results[0].geometry.location;
-						var newUrl = weatherUrl + 'lat=' + location.lat + '&lon=' + location.lng + appid;
-						sendRequest(newUrl, data, function(data){
-							displayFunc(data, name);
-						});
+					sendRequest(newUrl, newCityWeather, function(data){
+						displayFunc(data, data.name);
 					});
+					 
+					// name = cities[i].name;
+					// var gUrl = googleUrl + name + googleKey;
+					// var newCityWeather = null;
 
+					// sendRequest(gUrl, newCityWeather, function(data){
 
-				})(name);
+					// 	w.setLocalStorage(null, data, w.checkLocalStorage());
 
-				
+					// 	var newUrl = weatherUrl + 'lat=' + location.lat + '&lon=' + location.lng + appid;
+
+					// });
+				})(lat, lon);
 			}
 		}
 	}
 
-	w.addCityBtn.onclick = function() {
+	w.addCityBtn.onclick = function() {	
 
-		var newCity = prompt('Please insert city, only Latin letters applicable', 'Kiev');
-		var regE = /[A-Za-z]/;
-
-		console.log(regE.test(newCity))
+		var newCity = prompt('Please insert city, only Latin letters applicable', 'Kyiv');
 
 		if (newCity && regE.test(newCity)) {
 			var gUrl = googleUrl + newCity + googleKey;
 			var newCityWeather = null;
 
-			sendRequest(gUrl, newCityWeather, function(data){
+			sendRequest(gUrl, newCityWeather, function(data) {			
+				
+				// var c = localStorage.getItem('cities');
+				// c = c ? JSON.parse(c) : {};
+				// c.push(data.name);
+				// localStorage.setItem("cities", JSON.stringify(c));
+
 				var location = data.results[0].geometry.location;
 				var newUrl = weatherUrl + 'lat=' + location.lat + '&lon=' + location.lng + appid;
+				w.setLocalStorage(null, data, w.checkLocalStorage(null, data));
+				
 				sendRequest(newUrl, data, function(data){
 					displayFunc(data, newCity);
 				});
 			});
-
-			if (!localStorage.getItem('cities')) {
-				localStorage.setItem('cities', newCity);
-			} 
-			else {
-				var cities = localStorage.getItem('cities').split(',');
-				cities.push(newCity);
-				localStorage.setItem('cities', cities.join());
-			}
-		} else {
-			alert('Please insert the correct value');
 		}
-
 	}
 
-	// w.rmCityBtn.onclick = 
-
-	function removeCity() {
+	w.rmCityBtn.onclick = function(city) {
 		var cityToRemove = prompt('Which city do you want to remove?');
 
 		if (cityToRemove) {
@@ -161,9 +187,6 @@ function Weather () {
 					w.weatherInfoDiv.innerHTML = '';
 					w.getWeatherFunc();
 				} 
-				// else {
-				// 	alert('No such city');
-				// }
 			}
 		}
 	}
