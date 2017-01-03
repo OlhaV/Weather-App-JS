@@ -67,28 +67,33 @@ function Weather () {
 		return tempC;
 	}
 
-	w.checkLocalStorage = function() {
-		var c = localStorage.getItem('cities');
-		c = c ? [JSON.parse(c)] : [];
-		return c;
+	w.constructUrl = function (lat, lon) {
+		var url = weatherUrl + 'lat=' + lat + '&lon=' + lon + appid;
+		return url; 
+	}
+
+
+	w.getLocalStorage = function() {
+		var c = JSON.parse(localStorage.getItem('cities'));
+		return c ? c : [];
 	}
 		
-	w.setLocalStorage = function(data, googleData, cities) {
+	w.setLocalStorage = function(data, googleData, cities, name) {
 		if (data) {
 			city.name = data.name; 
 			city.coord.lat = data.coord.lat;
 			city.coord.lon = data.coord.lon;
-			cities.push(JSON.stringify(city));
-			console.log(city);
-			localStorage.setItem("cities", cities);
+			cities.push(city);
+			// console.log(JSON.stringify(cities));
+			localStorage.setItem("cities", JSON.stringify(cities));
 
 		} else if (googleData) {
-			//city.name = data.name; 
+			city.name = name; 
 			city.coord.lat = googleData.results[0].geometry.location.lat;
 			city.coord.lon = googleData.results[0].geometry.location.lng;
-			console.log(city);
-			cities.push(JSON.stringify(city));
-			localStorage.setItem("cities", cities);
+			// console.log('cities', cities);
+			cities.push(city);
+			localStorage.setItem("cities", JSON.stringify(cities));
 		}
 	}
 
@@ -98,14 +103,14 @@ function Weather () {
 		if(!localStorage.cities) {
 			if (navigator.geolocation) {
 				navigator.geolocation.getCurrentPosition(function(location){
-					w.lat = location.coords.latitude;
-					w.lon = location.coords.longitude;
-					var currentLocationWeather = null;
 
-					var url = weatherUrl + 'lat=' + w.lat + '&lon=' + w.lon + appid;
+					var currentLocationWeather = null;
+	
+					var url = w.constructUrl(location.coords.latitude, location.coords.longitude);
+
 					sendRequest(url, currentLocationWeather, function(data) {
 						displayFunc(data, data.name);
-						w.setLocalStorage(data, null, w.checkLocalStorage());
+						w.setLocalStorage(data, null, w.getLocalStorage());
 					});
 				});
 			}
@@ -116,39 +121,29 @@ function Weather () {
 
 	// in case there are items in localStorage, we get weather for each of them  
 		else {
-			var cities = w.checkLocalStorage();
-			var lat, lon;
+			var cities = w.getLocalStorage();
+			// console.log(cities);
+			var lat, lon, name;
 
 			for (var i = 0; i < cities.length; i++) {
 
-				(function(lat, lon){
-					lat = cities[i].coord.lat;
-					lon = cities[i].coord.lon;
-
-					var newUrl = weatherUrl + 'lat=' + lat + '&lon=' + lon + appid;
+				(function(lat, lon, name){
+					// console.log(c);
+					name = cities[i].name;
 					var newCityWeather = null;
 
+					var newUrl = w.constructUrl(cities[i].coord.lat, cities[i].coord.lon);
+
 					sendRequest(newUrl, newCityWeather, function(data){
-						displayFunc(data, data.name);
+						displayFunc(data, name);
 					});
 					 
-					// name = cities[i].name;
-					// var gUrl = googleUrl + name + googleKey;
-					// var newCityWeather = null;
-
-					// sendRequest(gUrl, newCityWeather, function(data){
-
-					// 	w.setLocalStorage(null, data, w.checkLocalStorage());
-
-					// 	var newUrl = weatherUrl + 'lat=' + location.lat + '&lon=' + location.lng + appid;
-
-					// });
-				})(lat, lon);
+				})(lat, lon, name);
 			}
 		}
 	}
 
-	w.addCityBtn.onclick = function() {	
+	w.addCityBtn.onclick = function() {
 
 		var newCity = prompt('Please insert city, only Latin letters applicable', 'Kyiv');
 
@@ -156,16 +151,13 @@ function Weather () {
 			var gUrl = googleUrl + newCity + googleKey;
 			var newCityWeather = null;
 
-			sendRequest(gUrl, newCityWeather, function(data) {			
-				
-				// var c = localStorage.getItem('cities');
-				// c = c ? JSON.parse(c) : {};
-				// c.push(data.name);
-				// localStorage.setItem("cities", JSON.stringify(c));
+			sendRequest(gUrl, newCityWeather, function(data) {
 
 				var location = data.results[0].geometry.location;
-				var newUrl = weatherUrl + 'lat=' + location.lat + '&lon=' + location.lng + appid;
-				w.setLocalStorage(null, data, w.checkLocalStorage(null, data));
+				
+				var newUrl = w.constructUrl(location.lat, location.lng);
+
+				w.setLocalStorage(null, data, w.getLocalStorage(null, data), newCity);
 				
 				sendRequest(newUrl, data, function(data){
 					displayFunc(data, newCity);
@@ -175,18 +167,23 @@ function Weather () {
 	}
 
 	w.rmCityBtn.onclick = function(city) {
-		var cityToRemove = prompt('Which city do you want to remove?');
+		var cityToRemove = prompt('Which city do you want to remove?', 'Kyiv');
 
 		if (cityToRemove) {
-			var cities = localStorage.getItem('cities').split(',');
+			var cities = w.getLocalStorage();
+			// console.log(cities);
 
 			for (var i = 0; i < cities.length; i++) {
-				if (cities[i] == cityToRemove) {
-					cities.splice(cities.indexOf(cityToRemove), 1);
-					localStorage.setItem('cities', cities);
+				if (cities[i].name == cityToRemove) {
+
+					cities.splice(i, 1);
+					// console.log(cities);
+
+					localStorage.setItem("cities", JSON.stringify(cities));
+
 					w.weatherInfoDiv.innerHTML = '';
 					w.getWeatherFunc();
-				} 
+				}
 			}
 		}
 	}
